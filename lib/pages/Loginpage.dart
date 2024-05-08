@@ -1,8 +1,13 @@
-import 'package:emergify/pages/LoginPage.dart';
+import 'package:emergify/services/auth_service.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import '../helper/helperfunction.dart';
+import '../services/databaseservice.dart';
 import '../widgets/widgets.dart';
-import 'registerpage.dart'; // Import the RegisterPage file
+import 'Homepage.dart';
+import 'registerpage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';// Import the RegisterPage file
 
 
 
@@ -18,6 +23,7 @@ class _LoginPageState extends State<LoginPage> {
   String email = "";
   String password = "";
   bool _isLoading = false;
+  AuthService authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -146,6 +152,34 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  login() {}
+  login() async{
+    if (formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+      await authService
+          .loginWithUserNameandPassword(email, password)
+          .then((value) async {
+        if (value == true) {
+          // saving the shared preference state
+          QuerySnapshot snapshot =
+          await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+              .gettingUserData(email);
+          // saving the values to our shared preferences
+          await HelperFunctions.saveUserLoggedInStatus(true);
+          await HelperFunctions.saveUserEmailSF(email);
+          await HelperFunctions.saveUserNameSF(snapshot.docs[0]['fullName']);
+          nextScreenReplace(context, const Homepage());
+
+
+        } else {
+          showSnackbar(context, Colors.red, value);
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      });
+    }
+  }
 }
 

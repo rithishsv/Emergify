@@ -1,3 +1,4 @@
+import 'package:emergify/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
 class Homepage extends StatefulWidget{
@@ -8,10 +9,13 @@ class Homepage extends StatefulWidget{
 }
 
 class _HomepageState extends State<Homepage>{
+  AuthService authService = AuthService();
   @override
   Widget build(BuildContext context){
     return Scaffold(
-      body: Center(child: Text("home page"),),
+      body: Center(child: ElevatedButton(child: Text("lOGOUT"), onPressed: (){
+        authService.signOut();
+      },)),
     );
   }
 }
