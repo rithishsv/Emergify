@@ -12,11 +12,19 @@ class DatabaseService {
     await userCollection.where("email", isEqualTo: email).get();
     return snapshot;
   }
-  Future savingUserData(String fullName, String email) async {
+  Future savingUserData(String fullName, String email,String phoneNumber, String address, String bloodType,String  medications,String medicationsText, String allergies,String allergiesText,String emergencyContact) async {
     return await userCollection.doc(uid).set({
       "fullName": fullName,
       "email": email,
       "uid": uid,
+      "phoneNumber": phoneNumber,
+      "address" : address,
+      "bloodType":bloodType,
+      "medications": medications, // Include medications field
+      "medicationsText": medicationsText,
+      "allergies": allergies,
+      "allergiesText":allergiesText,
+      "emergencyContact":emergencyContact
     });
   }
 }

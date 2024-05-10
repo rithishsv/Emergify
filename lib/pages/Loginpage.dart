@@ -9,8 +9,6 @@ import 'registerpage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';// Import the RegisterPage file
 
-
-
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
@@ -28,12 +26,37 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(30), // Set the preferred height here
+        child: AppBar(
+          backgroundColor: Colors.amber,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                "assets/logo.jpg",
+                width: 40,
+                height: 40,
+              ),
+              SizedBox(width: 8),
+              // Adjust the spacing as needed
+              Text(
+                "EMERGIFY",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+
       body: _isLoading
           ? Center(
         child: CircularProgressIndicator(
-            color: Theme
-                .of(context)
-                .primaryColor),
+          color: Theme.of(context).primaryColor,
+        ),
       )
           : SingleChildScrollView(
         child: Padding(
@@ -45,63 +68,64 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  const Text(
-                    "Emergify",
-                    style: TextStyle(
-                        fontSize: 40, fontWeight: FontWeight.bold),
-                  ),
                   const SizedBox(height: 10),
-                  const Text("Login",
+                  const Text("Login Now",
                       style: TextStyle(
-                          fontSize: 15, fontWeight: FontWeight.w400)),
+                          fontSize: 20, fontWeight: FontWeight.w400)),
                   //Image.asset("assets/login.png"),
-                  TextFormField(
-                    decoration: textInputDecoration.copyWith(
-                        labelText: "Email",
-                        prefixIcon: Icon(
-                          Icons.email,
-                          color: Theme
-                              .of(context)
-                              .primaryColor,
-                        )),
-                    onChanged: (val) {
-                      setState(() {
-                        email = val;
-                      });
-                    },
-
-                    // check tha validation
-                    validator: (val) {
-                      return RegExp(
-                          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                          .hasMatch(val!)
-                          ? null
-                          : "Please enter a valid email";
-                    },
-                  ),
-                  const SizedBox(height: 15),
-                  TextFormField(
-                    obscureText: true,
-                    decoration: textInputDecoration.copyWith(
-                        labelText: "Password",
-                        prefixIcon: Icon(
-                          Icons.lock,
-                          color: Theme
-                              .of(context)
-                              .primaryColor,
-                        )),
-                    validator: (val) {
-                      if (val!.length < 6) {
-                        return "Password must be at least 6 characters";
-                      } else {
-                        return null;
-                      }
-                    },
-                    onChanged: (val) {
-                      setState(() {
-                        password = val;
-                      });
-                    },
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: EdgeInsets.all(10),
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          decoration: textInputDecoration.copyWith(
+                              labelText: "Email or Username",
+                              prefixIcon: Icon(
+                                Icons.email,
+                                color: Theme.of(context).primaryColor,
+                              )),
+                          onChanged: (val) {
+                            setState(() {
+                              email = val;
+                            });
+                          },
+                          // check tha validation
+                          validator: (val) {
+                            return RegExp(
+                                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                .hasMatch(val!)
+                                ? null
+                                : "Please enter a valid email";
+                          },
+                        ),
+                        SizedBox(height: 10),
+                        TextFormField(
+                          obscureText: true,
+                          decoration: textInputDecoration.copyWith(
+                              labelText: "Password",
+                              prefixIcon: Icon(
+                                Icons.lock,
+                                color: Theme.of(context).primaryColor,
+                              )),
+                          validator: (val) {
+                            if (val!.length < 6) {
+                              return "Password must be at least 6 characters";
+                            } else {
+                              return null;
+                            }
+                          },
+                          onChanged: (val) {
+                            setState(() {
+                              password = val;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(
                     height: 20,
@@ -110,16 +134,15 @@ class _LoginPageState extends State<LoginPage> {
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme
-                              .of(context)
-                              .primaryColor,
+                          backgroundColor:
+                          Theme.of(context).primaryColor,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30))),
                       child: const Text(
                         "Sign In",
-                        style:
-                        TextStyle(color: Colors.white, fontSize: 16),
+                        style: TextStyle(
+                            color: Colors.white, fontSize: 16),
                       ),
                       onPressed: () {
                         login();
@@ -141,7 +164,7 @@ class _LoginPageState extends State<LoginPage> {
                               decoration: TextDecoration.underline),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
-                              nextScreen(context,  RegisterPage());
+                              nextScreen(context, RegisterPage());
                             }),
                     ],
                   )),
@@ -152,7 +175,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  login() async{
+  login() async {
     if (formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
@@ -162,16 +185,14 @@ class _LoginPageState extends State<LoginPage> {
           .then((value) async {
         if (value == true) {
           // saving the shared preference state
-          QuerySnapshot snapshot =
-          await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+          QuerySnapshot snapshot = await DatabaseService(
+              uid: FirebaseAuth.instance.currentUser!.uid)
               .gettingUserData(email);
           // saving the values to our shared preferences
           await HelperFunctions.saveUserLoggedInStatus(true);
           await HelperFunctions.saveUserEmailSF(email);
           await HelperFunctions.saveUserNameSF(snapshot.docs[0]['fullName']);
           nextScreenReplace(context, const Homepage());
-
-
         } else {
           showSnackbar(context, Colors.red, value);
           setState(() {
@@ -182,4 +203,3 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 }
-
