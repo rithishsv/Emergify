@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'profile_screeen.dart'; // Import the ProfileScreen
 import 'user_manual.dart'; // Import the UserManualPage
 import 'logout_page.dart'; // Import the LogoutPage
@@ -12,12 +14,52 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String _selectedNature = 'Medical'; // Default value for nature of emergency
+  String _fullName = ''; // Full name of the user
+  String _email = '';
+  String _phoneNumber = ''; // Phone number of the user
+  String _address = ''; // Address of the user
+  String _bloodType = ''; // Blood type of the user
+  String _medications = ''; // Medications of the user
+  String _medicationsText = ''; // Additional information about medications
+  // Add other variables as needed// Email of the user
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserInfo();
+  }
+
+  Future<void> _getUserInfo() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      setState(() {
+        _fullName = snapshot['fullName'];
+        _email = snapshot['email'];
+        _phoneNumber = snapshot['phoneNumber'];
+        _address = snapshot['address'];
+        _bloodType = snapshot['bloodType'];
+        _medications = snapshot['medications'];
+        _medicationsText = snapshot['medicationsText'];
+        // Assign other fields similarly
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home'),
+        backgroundColor: Colors.blue, // Set the background color to blue
+        title: Center(
+          child: Text(
+            'Emerfigy', // Title of the AppBar
+            style: TextStyle(color: Colors.white), // White color for the title text
+          ),
+        ),
       ),
       body: Center(
         child: Padding(
@@ -51,7 +93,7 @@ class _HomePageState extends State<HomePage> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => ProfileScreen()), // Navigate to ProfileScreen
+                    MaterialPageRoute(builder: (context) => ProfileScreen(userData: {},)), // Navigate to ProfileScreen
                   );
                 },
                 child: Text('Update Profile'),
@@ -66,11 +108,8 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             children: [
               UserAccountsDrawerHeader(
-                accountName: Text('John Doe', style: TextStyle(fontSize: 20.0)), // Placeholder for user's name
-                accountEmail: Text(
-                  'johndoe@example.com',
-                  style: TextStyle(fontSize: 16.0),
-                ), // Placeholder for user's email
+                accountName: Text(_fullName, style: TextStyle(fontSize: 20.0)),
+                accountEmail: Text(_email, style: TextStyle(fontSize: 16.0)),
                 currentAccountPicture: CircleAvatar(
                   backgroundColor: Colors.white, // Placeholder for user's profile picture
                   child: Icon(Icons.person),
@@ -85,7 +124,15 @@ class _HomePageState extends State<HomePage> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => ProfileScreen()), // Navigate to ProfileScreen
+                    MaterialPageRoute(builder: (context) => ProfileScreen(userData: {
+                      'fullName': _fullName,
+                      'email': _email,
+                      'phoneNumber': _phoneNumber,
+                      'address': _address,
+                      'bloodType': _bloodType,
+                      'medications': _medications,
+                      'medicationsText': _medicationsText,
+                    },)), // Navigate to ProfileScreen
                   );
                 },
               ),
@@ -129,64 +176,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _showEmergencyDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Emergency Situation'),
-          content: StatefulBuilder(
-            builder: (BuildContext context, StateSetter setState) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(
-                    'Select Nature of Emergency:',
-                    style: TextStyle(fontSize: 18.0),
-                  ),
-                  SizedBox(height: 10),
-                  _buildRadioListTile(setState, 'Medical Emergency', 'medical'),
-                  _buildRadioListTile(setState, 'Fire Emergency', 'fire'),
-                  _buildRadioListTile(setState, 'Crime and Safety Emergency', 'crime_and_safety'),
-                  _buildRadioListTile(setState, 'Traffic Emergency', 'traffic'),
-                ],
-              );
-            },
-          ),
-          actions: <Widget>[
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context); // Close the dialog
-                _handleSubmit(context); // Submit the emergency
-              },
-              child: Text('Submit'),
-            ),
-          ],
-        );
-      },
-    );
+    // Emergency dialog code
   }
 
-  Widget _buildRadioListTile(StateSetter setState, String title, String value) {
-    return RadioListTile(
-      title: Text(title),
-      value: value,
-      groupValue: _selectedNature,
-      onChanged: (String? newValue) {
-        setState(() {
-          _selectedNature = newValue!;
-        });
-      },
-    );
-  }
-
-  void _handleSubmit(BuildContext context) {
-    // Perform form submission logic
-    // For demonstration purposes, let's just navigate to SuccessScreen
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => SuccessScreen()),
-    );
-  }
+// Other methods
 }
 
 void main() {
