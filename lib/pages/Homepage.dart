@@ -5,7 +5,7 @@ import 'profile_screeen.dart'; // Import the ProfileScreen
 import 'user_manual.dart'; // Import the UserManualPage
 import 'logout_page.dart'; // Import the LogoutPage
 import 'report_emergency.dart'; // Import the ReportEmergencyPage
-import 'success_screen.dart'; // Import the SuccessScreen
+import 'update_profile_page.dart'; // Import the UpdateProfilePage
 
 class HomePage extends StatefulWidget {
   @override
@@ -20,7 +20,10 @@ class _HomePageState extends State<HomePage> {
   String _address = ''; // Address of the user
   String _bloodType = ''; // Blood type of the user
   String _medications = ''; // Medications of the user
-  String _medicationsText = ''; // Additional information about medications
+  String _medicationsText = '';
+  String _allergies = '' ;
+  String _allergiesText = '';
+  String _emergencyContact ='';// Additional information about medications
   // Add other variables as needed// Email of the user
 
   @override
@@ -44,6 +47,9 @@ class _HomePageState extends State<HomePage> {
         _bloodType = snapshot['bloodType'];
         _medications = snapshot['medications'];
         _medicationsText = snapshot['medicationsText'];
+        _allergies = snapshot['allergies'];
+        _allergiesText = snapshot['allergiesText'];
+        _emergencyContact = snapshot['emergencyContact'];
         // Assign other fields similarly
       });
     }
@@ -67,10 +73,7 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'Welcome to Help Me',
-                style: TextStyle(fontSize: 24.0),
-              ),
+
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
@@ -93,7 +96,20 @@ class _HomePageState extends State<HomePage> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => ProfileScreen(userData: {},)), // Navigate to ProfileScreen
+                    MaterialPageRoute(
+                      builder: (context) => UpdateProfilePage(
+                        fullName: _fullName,
+                        email: _email,
+                        phoneNumber: _phoneNumber,
+                        address: _address,
+                        bloodType: _bloodType,
+                        medications: _medications,
+                        medicationsText: _medicationsText,
+                        allergies: _allergies,
+                        allergiesText: _allergiesText,
+                        emergencyContact: _emergencyContact,
+                      ),
+                    ),
                   );
                 },
                 child: Text('Update Profile'),
@@ -132,6 +148,9 @@ class _HomePageState extends State<HomePage> {
                       'bloodType': _bloodType,
                       'medications': _medications,
                       'medicationsText': _medicationsText,
+                      'allergies' : _allergies,
+                      'allergiesText': _allergiesText,
+                      'emergencyContact' : _emergencyContact,
                     },)), // Navigate to ProfileScreen
                   );
                 },
@@ -149,24 +168,18 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
               ),
-              Expanded(
-                // Wrap the ListTile in an Expanded widget
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: ListTile(
-                    leading: Icon(Icons.logout),
-                    title: Text(
-                      'Logout',
-                      style: TextStyle(fontSize: 18.0, color: Colors.white),
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => LogoutPage()), // Navigate to LogoutPage
-                      );
-                    },
-                  ),
+              ListTile(
+                leading: Icon(Icons.logout),
+                title: Text(
+                  'Logout',
+                  style: TextStyle(fontSize: 18.0, color: Colors.white),
                 ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LogoutPage()), // Navigate to LogoutPage
+                  );
+                },
               ),
             ],
           ),
@@ -176,7 +189,36 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _showEmergencyDialog(BuildContext context) {
-    // Emergency dialog code
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Emergency Situation'),
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text(
+                    'Select Nature of Emergency:',
+                    style: TextStyle(fontSize: 18.0),
+                  ),
+                  // Replace this with radio button code
+                ],
+              );
+            },
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              onPressed: () {
+                // Placeholder action for "Submit" button
+              },
+              child: Text('Submit'),
+            ),
+          ],
+        );
+      },
+    ); // Emergency dialog code
   }
 
 // Other methods

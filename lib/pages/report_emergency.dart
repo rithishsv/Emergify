@@ -1,4 +1,3 @@
-// report_emergency.dart
 import 'package:flutter/material.dart';
 import 'success_screen.dart'; // Import the SuccessScreen
 
@@ -9,6 +8,7 @@ class ReportEmergencyPage extends StatefulWidget {
 
 class _ReportEmergencyPageState extends State<ReportEmergencyPage> {
   String _selectedNature = 'Medical'; // Default value for nature of emergency
+  bool _loading = false; // Variable to track loading state
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,11 @@ class _ReportEmergencyPageState extends State<ReportEmergencyPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: SingleChildScrollView(
+        child: _loading // Check if loading
+            ? Center(
+          child: CircularProgressIndicator(), // Show circular progress indicator
+        )
+            : SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -79,15 +83,22 @@ class _ReportEmergencyPageState extends State<ReportEmergencyPage> {
   }
 
   void _handleSubmit() {
+    setState(() {
+      _loading = true; // Set loading to true when submitting
+    });
+
     // Form submission logic
     // For demonstration purposes, let's just print the form data
     print('Nature of Emergency: $_selectedNature');
     // You can add more print statements to print other form fields
 
-    // Navigate to SuccessScreen
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => SuccessScreen()),
-    );
+    // Simulate delay for 2 seconds before navigating
+    Future.delayed(Duration(seconds: 2), () {
+      // Navigate to SuccessScreen
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => SuccessScreen()),
+      );
+    });
   }
 }
