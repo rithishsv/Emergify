@@ -33,6 +33,11 @@ dependencies:
   shared_preferences: ^2.0.15
   cupertino_icons: ^1.0.6
   cloud_firestore: ^4.17.3
+  app_settings: ^5.1.1
+  firebase_messaging: ^14.9.2
+  geolocator: ^9.0.2
+  geocoding:
+  fluttertoast:
 
 
 dev_dependencies:
@@ -47,6 +52,7 @@ dev_dependencies:
   flutter_lints: ^3.0.0
   firebase_core: ^2.28.0
   firebase_auth: ^4.19.0
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

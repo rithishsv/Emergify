@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:emergify/services/auth_service.dart';
 import '../helper/helperfunction.dart';
+import '../services/databaseservice.dart';
 import '../widgets/widgets.dart';
 import 'Homepage.dart';
 import 'LoginPage.dart';
-
+import 'package:firebase_messaging/firebase_messaging.dart';
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
 
@@ -314,21 +315,43 @@ class _RegisterPageState extends State<RegisterPage> {
       setState(() {
         _isLoading = true;
       });
-      await authService
-          .registerUserWithEmailandPassword(fullName, email, password, phoneNumber, address, bloodType,medications,medicationsText ?? "",allergies,allergiesText ?? "",emergencyContact)
-          .then((value) async {
+
+      // Obtain the device token
+      String? deviceToken = await FirebaseMessaging.instance.getToken();
+
+      await authService.registerUserWithEmailandPassword(
+        fullName,
+        email,
+        password,
+        phoneNumber,
+        address,
+        bloodType,
+        medications,
+        medicationsText ?? "",
+        allergies,
+        allergiesText ?? "",
+        emergencyContact,
+      ).then((value) async {
         if (value == true) {
+          // Update user data with device token
+          await DatabaseService(uid: value.uid).updateUserDataWithToken(deviceToken);
+
+          // Save user login status and data
           await HelperFunctions.saveUserLoggedInStatus(true);
           await HelperFunctions.saveUserEmailSF(email);
           await HelperFunctions.saveUserNameSF(fullName);
+
+          // Navigate to the home page
           nextScreenReplace(context, HomePage());
         } else {
+          // Show error message
           showSnackbar(context, Colors.red, value);
-          setState(() {
-            _isLoading = false;
-          });
         }
+        setState(() {
+          _isLoading = false;
+        });
       });
     }
   }
+
 }

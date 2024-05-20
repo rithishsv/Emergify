@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'profile_screeen.dart'; // Import the ProfileScreen
-import 'user_manual.dart'; // Import the UserManualPage
-import 'logout_page.dart'; // Import the LogoutPage
-import 'report_emergency.dart'; // Import the ReportEmergencyPage
-import 'update_profile_page.dart'; // Import the UpdateProfilePage
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'profile_screeen.dart';
+import 'user_manual.dart';
+import 'logout_page.dart';
+import 'report_emergency.dart';
+import 'update_profile_page.dart';
+import 'authenticate/notification_services.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -13,23 +17,36 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String _selectedNature = 'Medical'; // Default value for nature of emergency
-  String _fullName = ''; // Full name of the user
+  String? _currentAddress;
+  Position? _currentPosition;
+  String _fullName = '';
   String _email = '';
-  String _phoneNumber = ''; // Phone number of the user
-  String _address = ''; // Address of the user
-  String _bloodType = ''; // Blood type of the user
-  String _medications = ''; // Medications of the user
+  String _phoneNumber = '';
+  String _address = '';
+  String _bloodType = '';
+  String _medications = '';
   String _medicationsText = '';
-  String _allergies = '' ;
+  String _allergies = '';
   String _allergiesText = '';
-  String _emergencyContact ='';// Additional information about medications
-  // Add other variables as needed// Email of the user
+  String _emergencyContact = '';
+
+  NotificationServices notificationServices = NotificationServices();
 
   @override
   void initState() {
     super.initState();
     _getUserInfo();
+    notificationServices.requestNotificationPermission();
+
+    notificationServices.getDeviceToken().then((value) {
+      if (value != null) {
+        print('device token: $value');
+      } else {
+        print('Error: Device token is null');
+      }
+    }).catchError((error) {
+      print('Error getting device token: $error');
+    });
   }
 
   Future<void> _getUserInfo() async {
@@ -50,20 +67,61 @@ class _HomePageState extends State<HomePage> {
         _allergies = snapshot['allergies'];
         _allergiesText = snapshot['allergiesText'];
         _emergencyContact = snapshot['emergencyContact'];
-        // Assign other fields similarly
       });
     }
   }
+  Future<void> _getCurrentPosition() async {
+    final hasPermission = await _handleLocationPermission();
+    if (!hasPermission) return;
+    await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high)
+        .then((Position position) {
+      setState(() => _currentPosition = position);
+    }).catchError((e) {
+      debugPrint(e);
+    });
+  }
+  Future<bool> _handleLocationPermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Location services are disabled. Please enable the services')));
+      return false;
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Location permissions are denied')));
+        return false;
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Location permissions are permanently denied, we cannot request permissions.')));
+      return false;
+    }
+    return true;
+  }
+
+
+    // Determine the position only if the address is successfully fetched
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue, // Set the background color to blue
+        backgroundColor: Colors.blue,
         title: Center(
           child: Text(
-            'Emerfigy', // Title of the AppBar
-            style: TextStyle(color: Colors.white), // White color for the title text
+            'Emerfigy',
+            style: TextStyle(color: Colors.white),
           ),
         ),
       ),
@@ -73,20 +131,28 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-
+              Text('LAT: ${_currentPosition?.latitude ?? ""}'),
+              Text('LNG: ${_currentPosition?.longitude ?? ""}'),
+              Text('ADDRESS: ${_currentAddress ?? ""}'),
+              Text('ADDRESS: ${_currentAddress ?? ""}'),
+              const SizedBox(height: 32),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
-                  _showEmergencyDialog(context); // Show emergency dialog
-                },
-                child: Text('Need Help'),
+                onPressed: _getCurrentPosition,
+                child: const Text("Get Current Location"),
               ),
+              SizedBox(height: 20),
+              if (_address != null)
+                Text(
+                  'Current Address: $_address',
+                  style: TextStyle(fontSize: 18),
+                ),
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => ReportEmergencyPage()), // Navigate to ReportEmergencyPage
+                    MaterialPageRoute(builder: (context) => ReportEmergencyPage()),
                   );
                 },
                 child: Text('Report Emergency'),
@@ -120,14 +186,14 @@ class _HomePageState extends State<HomePage> {
       ),
       drawer: Drawer(
         child: Container(
-          color: Colors.blue, // Set drawer background color
+          color: Colors.blue,
           child: Column(
             children: [
               UserAccountsDrawerHeader(
                 accountName: Text(_fullName, style: TextStyle(fontSize: 20.0)),
                 accountEmail: Text(_email, style: TextStyle(fontSize: 16.0)),
                 currentAccountPicture: CircleAvatar(
-                  backgroundColor: Colors.white, // Placeholder for user's profile picture
+                  backgroundColor: Colors.white,
                   child: Icon(Icons.person),
                 ),
               ),
@@ -148,10 +214,10 @@ class _HomePageState extends State<HomePage> {
                       'bloodType': _bloodType,
                       'medications': _medications,
                       'medicationsText': _medicationsText,
-                      'allergies' : _allergies,
+                      'allergies': _allergies,
                       'allergiesText': _allergiesText,
-                      'emergencyContact' : _emergencyContact,
-                    },)), // Navigate to ProfileScreen
+                      'emergencyContact': _emergencyContact,
+                    },)),
                   );
                 },
               ),
@@ -164,7 +230,7 @@ class _HomePageState extends State<HomePage> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => UserManualPage()), // Navigate to UserManualPage
+                    MaterialPageRoute(builder: (context) => UserManualPage()),
                   );
                 },
               ),
@@ -177,7 +243,7 @@ class _HomePageState extends State<HomePage> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => LogoutPage()), // Navigate to LogoutPage
+                    MaterialPageRoute(builder: (context) => LogoutPage()),
                   );
                 },
               ),
@@ -187,6 +253,66 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+  String currentAddress = 'My Address';
+  Position? currentposition;
+
+  Future<void> _determinePosition() async {
+    print('Determining position...');
+
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      Fluttertoast.showToast(msg: 'Please enable Your Location Service');
+      return; // Stop execution if location service is not enabled
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        Fluttertoast.showToast(msg: 'Location permissions are denied');
+        return; // Stop execution if location permissions are denied
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      Fluttertoast.showToast(
+          msg:
+          'Location permissions are permanently denied, we cannot request permissions.');
+      return; // Stop execution if location permissions are permanently denied
+    }
+
+    Position? position;
+    try {
+      position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+    } catch (e) {
+      print(e);
+    }
+
+    if (position != null) {
+      try {
+        List<Placemark> placemarks = await placemarkFromCoordinates(
+            position.latitude, position.longitude);
+
+        Placemark place = placemarks[0];
+
+        setState(() {
+          currentposition = position;
+          currentAddress =
+          "${place.locality}, ${place.postalCode}, ${place.country}";
+        });
+      } catch (e) {
+        print(e);
+      }
+    } else {
+      // Handle the case where position is null (e.g., user denied permissions)
+      Fluttertoast.showToast(msg: 'Failed to get current location');
+    }
+  }
+
 
   void _showEmergencyDialog(BuildContext context) {
     showDialog(
@@ -203,25 +329,29 @@ class _HomePageState extends State<HomePage> {
                     'Select Nature of Emergency:',
                     style: TextStyle(fontSize: 18.0),
                   ),
-                  // Replace this with radio button code
+                  // Add radio buttons or other input widgets for selecting nature of emergency
                 ],
               );
             },
           ),
           actions: <Widget>[
-            ElevatedButton(
+            Text(currentAddress),
+            if (currentposition != null)
+              Text('Latitude = ${currentposition!.latitude.toString()}'),
+            if (currentposition != null)
+              Text('Longitude = ${currentposition!.longitude.toString()}'),
+            TextButton(
               onPressed: () {
-                // Placeholder action for "Submit" button
+                _determinePosition();
               },
-              child: Text('Submit'),
+              child: Text('Locate me'),
             ),
           ],
         );
       },
-    ); // Emergency dialog code
+    );
   }
 
-// Other methods
 }
 
 void main() {
