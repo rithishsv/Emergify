@@ -21,10 +21,9 @@ class _HomePageState extends State<HomePage> {
   String _bloodType = ''; // Blood type of the user
   String _medications = ''; // Medications of the user
   String _medicationsText = '';
-  String _allergies = '' ;
+  String _allergies = '';
   String _allergiesText = '';
-  String _emergencyContact ='';// Additional information about medications
-  // Add other variables as needed// Email of the user
+  String _emergencyContact = ''; // Additional information about medications
 
   @override
   void initState() {
@@ -50,7 +49,6 @@ class _HomePageState extends State<HomePage> {
         _allergies = snapshot['allergies'];
         _allergiesText = snapshot['allergiesText'];
         _emergencyContact = snapshot['emergencyContact'];
-        // Assign other fields similarly
       });
     }
   }
@@ -62,8 +60,8 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.blue, // Set the background color to blue
         title: Center(
           child: Text(
-            'Emerfigy', // Title of the AppBar
-            style: TextStyle(color: Colors.white), // White color for the title text
+            'Emergify', // Title of the AppBar
+            style: TextStyle(color: Colors.white, fontSize: 24), // White color for the title text
           ),
         ),
       ),
@@ -73,26 +71,63 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-
+              Image.asset(
+                'assets/emergify_logo.png',
+                height: 100.0,
+              ),
               SizedBox(height: 20),
+              Text(
+                'Your instant lifeline in critical moments',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  color: Colors.black54,
+                ),
+              ),
+              SizedBox(height: 40),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue, // Background color
+                  foregroundColor: Colors.white, // Text color
+                  minimumSize: Size(double.infinity, 50), // Full-width button
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
                 onPressed: () {
                   _showEmergencyDialog(context); // Show emergency dialog
                 },
-                child: Text('Need Help'),
+                child: Text('Need Help', style: TextStyle(fontSize: 18)),
               ),
               SizedBox(height: 20),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue, // Background color
+                  foregroundColor: Colors.white, // Text color
+                  minimumSize: Size(double.infinity, 50), // Full-width button
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => ReportEmergencyPage()), // Navigate to ReportEmergencyPage
+                    MaterialPageRoute(
+                      builder: (context) => ReportEmergencyPage(), // Navigate to ReportEmergencyPage
+                    ),
                   );
                 },
-                child: Text('Report Emergency'),
+                child: Text('Report Emergency', style: TextStyle(fontSize: 18)),
               ),
               SizedBox(height: 20),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue, // Background color
+                  foregroundColor: Colors.white, // Text color
+                  minimumSize: Size(double.infinity, 50), // Full-width button
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -112,77 +147,80 @@ class _HomePageState extends State<HomePage> {
                     ),
                   );
                 },
-                child: Text('Update Profile'),
+                child: Text('Update Profile', style: TextStyle(fontSize: 18)),
               ),
             ],
           ),
         ),
       ),
       drawer: Drawer(
-        child: Container(
-          color: Colors.blue, // Set drawer background color
-          child: Column(
-            children: [
-              UserAccountsDrawerHeader(
-                accountName: Text(_fullName, style: TextStyle(fontSize: 20.0)),
-                accountEmail: Text(_email, style: TextStyle(fontSize: 16.0)),
-                currentAccountPicture: CircleAvatar(
-                  backgroundColor: Colors.white, // Placeholder for user's profile picture
-                  child: Icon(Icons.person),
-                ),
+        child: ListView(
+          children: [
+            UserAccountsDrawerHeader(
+              accountName: Text(_fullName, style: TextStyle(fontSize: 20.0)),
+              accountEmail: Text(_email, style: TextStyle(fontSize: 16.0)),
+              currentAccountPicture: CircleAvatar(
+                backgroundColor: Colors.white, // Placeholder for user's profile picture
+                child: Icon(Icons.person, size: 40, color: Colors.blue),
               ),
-              ListTile(
-                leading: Icon(Icons.account_circle),
-                title: Text(
-                  'View Profile',
-                  style: TextStyle(fontSize: 18.0, color: Colors.white),
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ProfileScreen(userData: {
-                      'fullName': _fullName,
-                      'email': _email,
-                      'phoneNumber': _phoneNumber,
-                      'address': _address,
-                      'bloodType': _bloodType,
-                      'medications': _medications,
-                      'medicationsText': _medicationsText,
-                      'allergies' : _allergies,
-                      'allergiesText': _allergiesText,
-                      'emergencyContact' : _emergencyContact,
-                    },)), // Navigate to ProfileScreen
-                  );
-                },
+              decoration: BoxDecoration(color: Colors.blue), // Set background color of the header
+            ),
+            ListTile(
+              leading: Icon(Icons.account_circle, color: Colors.blue),
+              title: Text(
+                'View Profile',
+                style: TextStyle(fontSize: 18.0, color: Colors.blue),
               ),
-              ListTile(
-                leading: Icon(Icons.library_books),
-                title: Text(
-                  'User Manual',
-                  style: TextStyle(fontSize: 18.0, color: Colors.white),
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => UserManualPage()), // Navigate to UserManualPage
-                  );
-                },
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ProfileScreen(userData: {
+                        'fullName': _fullName,
+                        'email': _email,
+                        'phoneNumber': _phoneNumber,
+                        'address': _address,
+                        'bloodType': _bloodType,
+                        'medications': _medications,
+                        'medicationsText': _medicationsText,
+                        'allergies': _allergies,
+                        'allergiesText': _allergiesText,
+                        'emergencyContact': _emergencyContact,
+                      })), // Navigate to ProfileScreen
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.library_books, color: Colors.blue),
+              title: Text(
+                'User Manual',
+                style: TextStyle(fontSize: 18.0, color: Colors.blue),
               ),
-              ListTile(
-                leading: Icon(Icons.logout),
-                title: Text(
-                  'Logout',
-                  style: TextStyle(fontSize: 18.0, color: Colors.white),
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => LogoutPage()), // Navigate to LogoutPage
-                  );
-                },
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          UserManualPage()), // Navigate to UserManualPage
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.logout, color: Colors.blue),
+              title: Text(
+                'Logout',
+                style: TextStyle(fontSize: 18.0, color: Colors.blue),
               ),
-            ],
-          ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          LogoutPage()), // Navigate to LogoutPage
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -193,6 +231,7 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.white, // Set the background color to white
           title: Text('Emergency Situation'),
           content: StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
@@ -203,15 +242,52 @@ class _HomePageState extends State<HomePage> {
                     'Select Nature of Emergency:',
                     style: TextStyle(fontSize: 18.0),
                   ),
-                  // Replace this with radio button code
+                  RadioListTile<String>(
+                    activeColor: Colors.blue, // Change the radio button color to blue
+                    title: const Text('Medical'),
+                    value: 'Medical',
+                    groupValue: _selectedNature,
+                    onChanged: (String? value) {
+                      setState(() {
+                        _selectedNature = value!;
+                      });
+                    },
+                  ),
+                  RadioListTile<String>(
+                    activeColor: Colors.blue, // Change the radio button color to blue
+                    title: const Text('Fire'),
+                    value: 'Fire',
+                    groupValue: _selectedNature,
+                    onChanged: (String? value) {
+                      setState(() {
+                        _selectedNature = value!;
+                      });
+                    },
+                  ),
+                  RadioListTile<String>(
+                    activeColor: Colors.blue, // Change the radio button color to blue
+                    title: const Text('Police'),
+                    value: 'Police',
+                    groupValue: _selectedNature,
+                    onChanged: (String? value) {
+                      setState(() {
+                        _selectedNature = value!;
+                      });
+                    },
+                  ),
                 ],
               );
             },
           ),
           actions: <Widget>[
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.lightBlue, // Background color
+                foregroundColor: Colors.white, // Text color
+              ),
               onPressed: () {
-                // Placeholder action for "Submit" button
+                Navigator.of(context).pop();
+                // Handle emergency submission here
               },
               child: Text('Submit'),
             ),
@@ -220,12 +296,13 @@ class _HomePageState extends State<HomePage> {
       },
     ); // Emergency dialog code
   }
-
-// Other methods
 }
 
 void main() {
   runApp(MaterialApp(
     home: HomePage(),
+    theme: ThemeData(
+      primarySwatch: Colors.blue,
+    ),
   ));
 }

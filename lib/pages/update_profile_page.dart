@@ -62,6 +62,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.blue,
         title: Text('Update Profile'),
       ),
       body: Padding(
@@ -82,6 +83,10 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
               _buildTextField('Emergency Contact', _emergencyContactController),
               SizedBox(height: 20),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue, // Background color
+                  foregroundColor: Colors.white, // Text color
+                ),
                 onPressed: _updateProfile,
                 child: Text('Update'),
               ),
@@ -99,7 +104,27 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
         controller: controller,
         decoration: InputDecoration(
           labelText: label,
-          border: OutlineInputBorder(),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.blue,
+              width: 2.0,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.blue,
+              width: 1.0,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.blue,
+              width: 2.0,
+            ),
+          ),
         ),
       ),
     );
@@ -157,7 +182,6 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
       );
     }
   }
-
 
   @override
   void dispose() {
