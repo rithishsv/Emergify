@@ -5,7 +5,13 @@ class UserManualPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('User Manual'),
+        backgroundColor: Colors.blue,
+        title: Center(
+          child: Text(
+            'User Manual',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(20.0),
@@ -85,6 +91,7 @@ class UserManualPage extends StatelessWidget {
         style: TextStyle(
           fontSize: 20.0,
           fontWeight: FontWeight.bold,
+          color: Colors.blue[900],
         ),
       ),
     );
@@ -95,45 +102,57 @@ class UserManualPage extends StatelessWidget {
     required String title,
     required List<String> content,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              number,
-              style: TextStyle(
-                fontSize: 16.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(width: 5.0),
-            Expanded(
-              child: Text(
-                title,
+    return Container(
+      padding: EdgeInsets.all(20.0),
+      margin: EdgeInsets.symmetric(vertical: 10.0),
+      decoration: BoxDecoration(
+        color: Colors.lightBlue.shade50,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                number,
                 style: TextStyle(
                   fontSize: 16.0,
                   fontWeight: FontWeight.bold,
+                  color: Colors.blue[800],
                 ),
               ),
-            ),
-          ],
-        ),
-        SizedBox(height: 5.0),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: content.map((item) => _buildParagraph(item)).toList(),
-        ),
-        SizedBox(height: 10.0),
-      ],
+              SizedBox(width: 5.0),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue[800],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 5.0),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: content.map((item) => _buildParagraph(item)).toList(),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildParagraph(String text) {
     return Padding(
-      padding: EdgeInsets.only(left: 20.0),
-      child: Text(text),
+      padding: EdgeInsets.only(left: 20.0, bottom: 5.0),
+      child: Text(
+        text,
+        style: TextStyle(fontSize: 16.0, color: Colors.blue[700]),
+      ),
     );
   }
 }

@@ -1,38 +1,22 @@
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.0'
-        classpath 'com.google.gms:google-services:4.3.15' // Google Services plugin
-    }
-}
-
 plugins {
-    id "com.google.gms.google-services" version "4.3.15" apply false
+    id("com.google.gms.google-services") version "4.4.1" apply false
 }
-
 allprojects {
     repositories {
         google()
         mavenCentral()
     }
-
-    // Configure build directory for all subprojects
-    project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
 
-// Configure task to clean build directories
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(':app')
+}
+
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
 
-// Add dependencies for all projects (including app)
-subprojects {
-    dependencies {
-        // Specify the dependency without using the implementation() method
-        // Replace version 21.6.2 with the correct version available in the repositories
-        'com.google.android.gms:play-services:16.0.0'
-    }
-}

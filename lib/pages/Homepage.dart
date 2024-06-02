@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
-import 'profile_screeen.dart';
-import 'user_manual.dart';
-import 'logout_page.dart';
-import 'report_emergency.dart';
-import 'update_profile_page.dart';
-import 'authenticate/notification_services.dart';
+import 'profile_screeen.dart'; // Import the ProfileScreen
+import 'user_manual.dart'; // Import the UserManualPage
+import 'logout_page.dart'; // Import the LogoutPage
+import 'report_emergency.dart'; // Import the ReportEmergencyPage
+import 'update_profile_page.dart'; // Import the UpdateProfilePage
 
 class HomePage extends StatefulWidget {
   @override
@@ -17,36 +13,22 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String? _currentAddress;
-  Position? _currentPosition;
-  String _fullName = '';
+  String _selectedNature = 'Medical'; // Default value for nature of emergency
+  String _fullName = ''; // Full name of the user
   String _email = '';
-  String _phoneNumber = '';
-  String _address = '';
-  String _bloodType = '';
-  String _medications = '';
+  String _phoneNumber = ''; // Phone number of the user
+  String _address = ''; // Address of the user
+  String _bloodType = ''; // Blood type of the user
+  String _medications = ''; // Medications of the user
   String _medicationsText = '';
   String _allergies = '';
   String _allergiesText = '';
-  String _emergencyContact = '';
-
-  NotificationServices notificationServices = NotificationServices();
+  String _emergencyContact = ''; // Additional information about medications
 
   @override
   void initState() {
     super.initState();
     _getUserInfo();
-    notificationServices.requestNotificationPermission();
-
-    notificationServices.getDeviceToken().then((value) {
-      if (value != null) {
-        print('device token: $value');
-      } else {
-        print('Error: Device token is null');
-      }
-    }).catchError((error) {
-      print('Error getting device token: $error');
-    });
   }
 
   Future<void> _getUserInfo() async {
@@ -70,58 +52,16 @@ class _HomePageState extends State<HomePage> {
       });
     }
   }
-  Future<void> _getCurrentPosition() async {
-    final hasPermission = await _handleLocationPermission();
-    if (!hasPermission) return;
-    await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high)
-        .then((Position position) {
-      setState(() => _currentPosition = position);
-    }).catchError((e) {
-      debugPrint(e);
-    });
-  }
-  Future<bool> _handleLocationPermission() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Location services are disabled. Please enable the services')));
-      return false;
-    }
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Location permissions are denied')));
-        return false;
-      }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Location permissions are permanently denied, we cannot request permissions.')));
-      return false;
-    }
-    return true;
-  }
-
-
-    // Determine the position only if the address is successfully fetched
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.blue, // Set the background color to blue
         title: Center(
           child: Text(
-            'Emerfigy',
-            style: TextStyle(color: Colors.white),
+            'Emergify', // Title of the AppBar
+            style: TextStyle(color: Colors.white, fontSize: 24), // White color for the title text
           ),
         ),
       ),
@@ -131,34 +71,63 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('LAT: ${_currentPosition?.latitude ?? ""}'),
-              Text('LNG: ${_currentPosition?.longitude ?? ""}'),
-              Text('ADDRESS: ${_currentAddress ?? ""}'),
-              Text('ADDRESS: ${_currentAddress ?? ""}'),
-              const SizedBox(height: 32),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _getCurrentPosition,
-                child: const Text("Get Current Location"),
+              Image.asset(
+                'assets/emergify_logo.png',
+                height: 100.0,
               ),
               SizedBox(height: 20),
-              if (_address != null)
-                Text(
-                  'Current Address: $_address',
-                  style: TextStyle(fontSize: 18),
+              Text(
+                'Your instant lifeline in critical moments',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  color: Colors.black54,
                 ),
+              ),
+              SizedBox(height: 40),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue, // Background color
+                  foregroundColor: Colors.white, // Text color
+                  minimumSize: Size(double.infinity, 50), // Full-width button
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: () {
+                  _showEmergencyDialog(context); // Show emergency dialog
+                },
+                child: Text('Need Help', style: TextStyle(fontSize: 18)),
+              ),
               SizedBox(height: 20),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue, // Background color
+                  foregroundColor: Colors.white, // Text color
+                  minimumSize: Size(double.infinity, 50), // Full-width button
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => ReportEmergencyPage()),
+                    MaterialPageRoute(
+                      builder: (context) => ReportEmergencyPage(), // Navigate to ReportEmergencyPage
+                    ),
                   );
                 },
-                child: Text('Report Emergency'),
+                child: Text('Report Emergency', style: TextStyle(fontSize: 18)),
               ),
               SizedBox(height: 20),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue, // Background color
+                  foregroundColor: Colors.white, // Text color
+                  minimumSize: Size(double.infinity, 50), // Full-width button
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -178,147 +147,91 @@ class _HomePageState extends State<HomePage> {
                     ),
                   );
                 },
-                child: Text('Update Profile'),
+                child: Text('Update Profile', style: TextStyle(fontSize: 18)),
               ),
             ],
           ),
         ),
       ),
       drawer: Drawer(
-        child: Container(
-          color: Colors.blue,
-          child: Column(
-            children: [
-              UserAccountsDrawerHeader(
-                accountName: Text(_fullName, style: TextStyle(fontSize: 20.0)),
-                accountEmail: Text(_email, style: TextStyle(fontSize: 16.0)),
-                currentAccountPicture: CircleAvatar(
-                  backgroundColor: Colors.white,
-                  child: Icon(Icons.person),
-                ),
+        child: ListView(
+          children: [
+            UserAccountsDrawerHeader(
+              accountName: Text(_fullName, style: TextStyle(fontSize: 20.0)),
+              accountEmail: Text(_email, style: TextStyle(fontSize: 16.0)),
+              currentAccountPicture: CircleAvatar(
+                backgroundColor: Colors.white, // Placeholder for user's profile picture
+                child: Icon(Icons.person, size: 40, color: Colors.blue),
               ),
-              ListTile(
-                leading: Icon(Icons.account_circle),
-                title: Text(
-                  'View Profile',
-                  style: TextStyle(fontSize: 18.0, color: Colors.white),
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ProfileScreen(userData: {
-                      'fullName': _fullName,
-                      'email': _email,
-                      'phoneNumber': _phoneNumber,
-                      'address': _address,
-                      'bloodType': _bloodType,
-                      'medications': _medications,
-                      'medicationsText': _medicationsText,
-                      'allergies': _allergies,
-                      'allergiesText': _allergiesText,
-                      'emergencyContact': _emergencyContact,
-                    },)),
-                  );
-                },
+              decoration: BoxDecoration(color: Colors.blue), // Set background color of the header
+            ),
+            ListTile(
+              leading: Icon(Icons.account_circle, color: Colors.blue),
+              title: Text(
+                'View Profile',
+                style: TextStyle(fontSize: 18.0, color: Colors.blue),
               ),
-              ListTile(
-                leading: Icon(Icons.library_books),
-                title: Text(
-                  'User Manual',
-                  style: TextStyle(fontSize: 18.0, color: Colors.white),
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => UserManualPage()),
-                  );
-                },
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ProfileScreen(userData: {
+                        'fullName': _fullName,
+                        'email': _email,
+                        'phoneNumber': _phoneNumber,
+                        'address': _address,
+                        'bloodType': _bloodType,
+                        'medications': _medications,
+                        'medicationsText': _medicationsText,
+                        'allergies': _allergies,
+                        'allergiesText': _allergiesText,
+                        'emergencyContact': _emergencyContact,
+                      })), // Navigate to ProfileScreen
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.library_books, color: Colors.blue),
+              title: Text(
+                'User Manual',
+                style: TextStyle(fontSize: 18.0, color: Colors.blue),
               ),
-              ListTile(
-                leading: Icon(Icons.logout),
-                title: Text(
-                  'Logout',
-                  style: TextStyle(fontSize: 18.0, color: Colors.white),
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => LogoutPage()),
-                  );
-                },
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          UserManualPage()), // Navigate to UserManualPage
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.logout, color: Colors.blue),
+              title: Text(
+                'Logout',
+                style: TextStyle(fontSize: 18.0, color: Colors.blue),
               ),
-            ],
-          ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          LogoutPage()), // Navigate to LogoutPage
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
   }
-  String currentAddress = 'My Address';
-  Position? currentposition;
-
-  Future<void> _determinePosition() async {
-    print('Determining position...');
-
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      Fluttertoast.showToast(msg: 'Please enable Your Location Service');
-      return; // Stop execution if location service is not enabled
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        Fluttertoast.showToast(msg: 'Location permissions are denied');
-        return; // Stop execution if location permissions are denied
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      Fluttertoast.showToast(
-          msg:
-          'Location permissions are permanently denied, we cannot request permissions.');
-      return; // Stop execution if location permissions are permanently denied
-    }
-
-    Position? position;
-    try {
-      position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-    } catch (e) {
-      print(e);
-    }
-
-    if (position != null) {
-      try {
-        List<Placemark> placemarks = await placemarkFromCoordinates(
-            position.latitude, position.longitude);
-
-        Placemark place = placemarks[0];
-
-        setState(() {
-          currentposition = position;
-          currentAddress =
-          "${place.locality}, ${place.postalCode}, ${place.country}";
-        });
-      } catch (e) {
-        print(e);
-      }
-    } else {
-      // Handle the case where position is null (e.g., user denied permissions)
-      Fluttertoast.showToast(msg: 'Failed to get current location');
-    }
-  }
-
 
   void _showEmergencyDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.white, // Set the background color to white
           title: Text('Emergency Situation'),
           content: StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
@@ -329,33 +242,67 @@ class _HomePageState extends State<HomePage> {
                     'Select Nature of Emergency:',
                     style: TextStyle(fontSize: 18.0),
                   ),
-                  // Add radio buttons or other input widgets for selecting nature of emergency
+                  RadioListTile<String>(
+                    activeColor: Colors.blue, // Change the radio button color to blue
+                    title: const Text('Medical'),
+                    value: 'Medical',
+                    groupValue: _selectedNature,
+                    onChanged: (String? value) {
+                      setState(() {
+                        _selectedNature = value!;
+                      });
+                    },
+                  ),
+                  RadioListTile<String>(
+                    activeColor: Colors.blue, // Change the radio button color to blue
+                    title: const Text('Fire'),
+                    value: 'Fire',
+                    groupValue: _selectedNature,
+                    onChanged: (String? value) {
+                      setState(() {
+                        _selectedNature = value!;
+                      });
+                    },
+                  ),
+                  RadioListTile<String>(
+                    activeColor: Colors.blue, // Change the radio button color to blue
+                    title: const Text('Police'),
+                    value: 'Police',
+                    groupValue: _selectedNature,
+                    onChanged: (String? value) {
+                      setState(() {
+                        _selectedNature = value!;
+                      });
+                    },
+                  ),
                 ],
               );
             },
           ),
           actions: <Widget>[
-            Text(currentAddress),
-            if (currentposition != null)
-              Text('Latitude = ${currentposition!.latitude.toString()}'),
-            if (currentposition != null)
-              Text('Longitude = ${currentposition!.longitude.toString()}'),
-            TextButton(
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.lightBlue, // Background color
+                foregroundColor: Colors.white, // Text color
+              ),
               onPressed: () {
-                _determinePosition();
+                Navigator.of(context).pop();
+                // Handle emergency submission here
               },
-              child: Text('Locate me'),
+              child: Text('Submit'),
             ),
           ],
         );
       },
-    );
+    ); // Emergency dialog code
   }
-
 }
 
 void main() {
   runApp(MaterialApp(
     home: HomePage(),
+    theme: ThemeData(
+      primarySwatch: Colors.blue,
+    ),
   ));
 }

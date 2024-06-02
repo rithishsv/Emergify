@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'success_screen.dart'; // Import the SuccessScreen
 
@@ -8,21 +9,21 @@ class ReportEmergencyPage extends StatefulWidget {
 
 class _ReportEmergencyPageState extends State<ReportEmergencyPage> {
   String _selectedNature = 'Medical'; // Default value for nature of emergency
-  bool _loading = false; // Variable to track loading state
+  TextEditingController _locationController = TextEditingController();
+  TextEditingController _peopleInvolvedController = TextEditingController();
+  TextEditingController _contactInfoController = TextEditingController();
+  TextEditingController _additionalInfoController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.blue,
         title: Text('Report Emergency'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: _loading // Check if loading
-            ? Center(
-          child: CircularProgressIndicator(), // Show circular progress indicator
-        )
-            : SingleChildScrollView(
+        child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -31,35 +32,132 @@ class _ReportEmergencyPageState extends State<ReportEmergencyPage> {
                 style: TextStyle(fontSize: 18.0),
               ),
               SizedBox(height: 10),
-              _buildRadioListTile('Medical Emergency', 'medical'),
-              _buildRadioListTile('Fire Emergency', 'fire'),
-              _buildRadioListTile('Crime and Safety Emergency', 'crime_and_safety'),
-              _buildRadioListTile('Traffic Emergency', 'traffic'),
-              SizedBox(height: 20),
-              Text(
-                'Location:',
-                style: TextStyle(fontSize: 18.0),
+              _buildRadioListTile('Medical Emergency', 'Medical'),
+              _buildRadioListTile('Fire Emergency', 'Fire'),
+              _buildRadioListTile('Crime and Safety Emergency', 'Crime and Safety'),
+              _buildRadioListTile('Traffic Emergency', 'Traffic'),
+
+              TextField(
+                controller: _locationController,
+                decoration: InputDecoration(
+                  labelText: 'Location',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.blue,
+                      width: 2.0,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.blue,
+                      width: 1.0,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.blue,
+                      width: 2.0,
+                    ),
+                  ),
+                ),
               ),
-              // Replace with your implementation for location selection
-              Text('Phone Location'), // Placeholder for phone location
               SizedBox(height: 20),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Number of People Involved'),
+              TextField(
+                controller: _peopleInvolvedController,
+                decoration: InputDecoration(
+                  labelText: 'Number of People Involved',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.blue,
+                      width: 2.0,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.blue,
+                      width: 1.0,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.blue,
+                      width: 2.0,
+                    ),
+                  ),
+                ),
                 keyboardType: TextInputType.number,
               ),
               SizedBox(height: 20),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Contact Information'),
+              TextField(
+                controller: _contactInfoController,
+                decoration: InputDecoration(
+                  labelText: 'Contact Information',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.blue,
+                      width: 2.0,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.blue,
+                      width: 1.0,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.blue,
+                      width: 2.0,
+                    ),
+                  ),
+                ),
                 keyboardType: TextInputType.phone,
               ),
               SizedBox(height: 20),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Additional Information'),
+              TextField(
+                controller: _additionalInfoController,
+                decoration: InputDecoration(
+                  labelText: 'Additional Information',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.blue,
+                      width: 2.0,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.blue,
+                      width: 1.0,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.blue,
+                      width: 2.0,
+                    ),
+                  ),
+                ),
                 maxLines: 3,
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _handleSubmit, // Call _handleSubmit function when button is pressed
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue, // Background color
+                  foregroundColor: Colors.white, // Text color
+                ),
+                onPressed: _handleSubmit,
                 child: Text('Submit'),
               ),
             ],
@@ -70,7 +168,8 @@ class _ReportEmergencyPageState extends State<ReportEmergencyPage> {
   }
 
   Widget _buildRadioListTile(String title, String value) {
-    return RadioListTile(
+    return RadioListTile<String>(
+      activeColor: Colors.blue, // Change the radio button color to blue
       title: Text(title),
       value: value,
       groupValue: _selectedNature,
@@ -82,23 +181,38 @@ class _ReportEmergencyPageState extends State<ReportEmergencyPage> {
     );
   }
 
-  void _handleSubmit() {
-    setState(() {
-      _loading = true; // Set loading to true when submitting
-    });
+  void _handleSubmit() async {
+    String location = _locationController.text;
+    String peopleInvolved = _peopleInvolvedController.text;
+    String contactInfo = _contactInfoController.text;
+    String additionalInfo = _additionalInfoController.text;
 
-    // Form submission logic
-    // For demonstration purposes, let's just print the form data
-    print('Nature of Emergency: $_selectedNature');
-    // You can add more print statements to print other form fields
+    try {
+      // Save the form data to Firestore
+      await FirebaseFirestore.instance.collection('emergencies').add({
+        'nature': _selectedNature,
+        'location': location,
+        'peopleInvolved': peopleInvolved,
+        'contactInfo': contactInfo,
+        'additionalInfo': additionalInfo,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
 
-    // Simulate delay for 2 seconds before navigating
-    Future.delayed(Duration(seconds: 2), () {
-      // Navigate to SuccessScreen
+      // Navigate to success screen
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => SuccessScreen()),
       );
-    });
+    } catch (e) {
+      // Handle any errors that occur during the submission process
+      print('Error submitting emergency report: $e');
+      // Show an error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('An error occurred. Please try again later.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 }
