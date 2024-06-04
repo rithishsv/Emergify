@@ -36,6 +36,7 @@ dependencies:
   app_settings: ^5.1.1
   firebase_messaging: ^14.9.2
   geolocator: ^9.0.2
+  flutter_sms: ^2.3.2
   geocoding:
   fluttertoast:
 

@@ -8,6 +8,7 @@ import '../services/databaseservice.dart';
 import '../widgets/widgets.dart';
 import 'Homepage.dart';
 import 'registerpage.dart';
+import 'admin_home.dart'; // Import the AdminHomePage
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -217,9 +218,16 @@ class _LoginPageState extends State<LoginPage> {
 
   login() async {
     if (formKey.currentState!.validate()) {
+      // Check for admin credentials
+      if (email == "ok@gmail.com" && password == "1234567") {
+        nextScreenReplace(context, AdminHomePage()); // Navigate to AdminHomePage
+        return;
+      }
+
       setState(() {
         _isLoading = true;
       });
+
       await authService.loginWithUserNameandPassword(email, password).then((value) async {
         if (value == true) {
           // Saving the shared preference state

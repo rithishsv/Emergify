@@ -53,6 +53,123 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> _sendHelpNotification() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      String fullName = snapshot['fullName'];
+
+      await FirebaseFirestore.instance.collection('notifications').add({
+        'fullName': fullName,
+        'message': 'Need help from $fullName',
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    }
+  }
+
+  Stream<List<Map<String, dynamic>>> _getNotifications() {
+    return FirebaseFirestore.instance
+        .collection('notifications')
+        .orderBy('timestamp', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+      Timestamp timestamp = doc['timestamp'] as Timestamp;
+      DateTime dateTime = timestamp.toDate();
+      String formattedDate = '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute}:${dateTime.second}';
+      return {
+        'fullName': doc['fullName'],
+        'message': doc['message'],
+        'timestamp': formattedDate,
+      };
+    }).toList());
+  }
+
+  void _showNotificationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StreamBuilder<List<Map<String, dynamic>>>(
+          stream: _getNotifications(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return AlertDialog(
+                title: Text('Notifications'),
+                content: CircularProgressIndicator(),
+              );
+            }
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return AlertDialog(
+                title: Text('Notifications'),
+                content: Text('No notifications'),
+                actions: <Widget>[
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.lightBlue, // Background color
+                      foregroundColor: Colors.white, // Text color
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            }
+            return AlertDialog(
+              title: Text('Notifications'),
+              content: Container(
+                width: double.maxFinite,
+                child: ListView(
+                  shrinkWrap: true,
+                  children: snapshot.data!.map((notification) {
+                    return ListTile(
+                      title: Text(notification['message']),
+                      subtitle: Text(notification['timestamp']),
+                    );
+                  }).toList(),
+                ),
+              ),
+              actions: <Widget>[
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.lightBlue, // Background color
+                    foregroundColor: Colors.white, // Text color
+                  ),
+                  onPressed: () async {
+                    // Clear all notifications
+                    QuerySnapshot notificationsSnapshot = await FirebaseFirestore.instance
+                        .collection('notifications')
+                        .get();
+
+                    for (DocumentSnapshot doc in notificationsSnapshot.docs) {
+                      await doc.reference.delete();
+                    }
+
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Clear'),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.lightBlue, // Background color
+                    foregroundColor: Colors.white, // Text color
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,6 +181,12 @@ class _HomePageState extends State<HomePage> {
             style: TextStyle(color: Colors.white, fontSize: 24), // White color for the title text
           ),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.notifications),
+            onPressed: _showNotificationDialog,
+          ),
+        ],
       ),
       body: Center(
         child: Padding(
@@ -94,6 +217,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 onPressed: () {
+                  _sendHelpNotification(); // Send help notification
                   _showEmergencyDialog(context); // Show emergency dialog
                 },
                 child: Text('Need Help', style: TextStyle(fontSize: 18)),
