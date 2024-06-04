@@ -64,7 +64,7 @@ class _HomePageState extends State<HomePage> {
 
       await FirebaseFirestore.instance.collection('notifications').add({
         'fullName': fullName,
-        'message': 'Need help from $fullName',
+        'message': 'Need help from $fullName $_selectedNature',
         'timestamp': FieldValue.serverTimestamp(),
       });
     }
