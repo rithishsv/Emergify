@@ -109,52 +109,29 @@ class AdminHomePage extends StatelessWidget {
         child: ListView(
           children: [
             UserAccountsDrawerHeader(
-              accountName: Text('Admin Name', style: TextStyle(fontSize: 20.0)),
-              accountEmail: Text('admin@example.com', style: TextStyle(fontSize: 16.0)),
+              accountName: Text('Sanjeevani', style: TextStyle(fontSize: 20.0)),
+              accountEmail: Text('sanjeevani@gmail.com', style: TextStyle(fontSize: 16.0)),
               currentAccountPicture: CircleAvatar(
                 backgroundColor: Colors.white, // Placeholder for user's profile picture
                 child: Icon(Icons.person, size: 40, color: Colors.blue),
               ),
               decoration: BoxDecoration(color: Colors.blue), // Set background color of the header
             ),
+
+
+
+
+
             ListTile(
-              leading: Icon(Icons.account_circle, color: Colors.blue),
-              title: Text(
-                'View Profile',
-                style: TextStyle(fontSize: 18.0, color: Colors.blue),
-              ),
+              leading: Icon(Icons.info, color: Colors.blue),
+              title: Text('License and Address', style: TextStyle(fontSize: 18.0, color: Colors.blue)),
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ProfileScreen(userData: {
-                        'fullName': 'Admin Name',
-                        'email': 'admin@example.com',
-                        'phoneNumber': '1234567890',
-                        'address': '123 Admin St',
-                        'bloodType': 'O+',
-                        'medications': 'None',
-                        'medicationsText': '',
-                        'allergies': 'None',
-                        'allergiesText': '',
-                        'emergencyContact': '9876543210',
-                      })), // Navigate to ProfileScreen
-                );
+                // Add functionality here if needed, e.g., navigate to a detailed page
               },
-            ),
-            ListTile(
-              leading: Icon(Icons.library_books, color: Colors.blue),
-              title: Text(
-                'User Manual',
-                style: TextStyle(fontSize: 18.0, color: Colors.blue),
+              subtitle: Text(
+                'License No: 123-456-789\nAddress: 456 NGO Lane, Charity City, 12345',
+                style: TextStyle(fontSize: 14.0),
               ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => UserManualPage()), // Navigate to UserManualPage
-                );
-              },
             ),
             ListTile(
               leading: Icon(Icons.logout, color: Colors.blue),
@@ -254,25 +231,75 @@ class EmergencyReportsPage extends StatelessWidget {
   }
 }
 
+class Helper {
+  final String name;
+  final String email;
+  final String phoneNumber;
+  final String location;  // Added location field
+
+  Helper({required this.name, required this.email, required this.phoneNumber, required this.location});
+}
+
+
 class LocateHelperPage extends StatelessWidget {
+  final List<Helper> helpers = [
+    Helper(name: 'Alice Johnson',
+        email: 'alice.johnson@example.com',
+        phoneNumber: '123-456-7890',
+        location: 'New York, NY'),
+    Helper(name: 'Bob Smith',
+        email: 'bob.smith@example.com',
+        phoneNumber: '234-567-8901',
+        location: 'San Francisco, CA'),
+    Helper(name: 'Charlie Brown',
+        email: 'charlie.brown@example.com',
+        phoneNumber: '345-678-9012',
+        location: 'Chicago, IL'),
+    Helper(name: 'David Wilson',
+        email: 'david.wilson@example.com',
+        phoneNumber: '456-789-0123',
+        location: 'Miami, FL'),
+    Helper(name: 'Eva Green',
+        email: 'eva.green@example.com',
+        phoneNumber: '567-890-1234',
+        location: 'Dallas, TX'),
+  ];
+
   @override
   Widget build(BuildContext context) {
-    // Implement the UI for locating available helpers
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue, // Set the background color to blue
-        title: Center(
-          child: Text(
-            'Locate Available Helper', // Title of the AppBar
-            style: TextStyle(color: Colors.white, fontSize: 24), // White color for the title text
-          ),
+        backgroundColor: Colors.blue,
+        title: Text(
+          'Locate Available Helper',
+          style: TextStyle(color: Colors.white, fontSize: 24),
         ),
       ),
-      body: Center(
-        child: Text(
-          'Functionality to locate available helpers will be implemented here.',
-          style: TextStyle(fontSize: 18.0, color: Colors.black54),
-        ),
+      body: ListView.builder(
+        itemCount: helpers.length,
+        itemBuilder: (context, index) {
+          final helper = helpers[index];
+          return ListTile(
+            title: Text(helper.name),
+            subtitle: Text(
+                '${helper.email}\n${helper.phoneNumber}\nLocation: ${helper
+                    .location}'), // Include location in subtitle
+            trailing: IconButton(
+              icon: Icon(Icons.notification_important, color: Colors.blue),
+              onPressed: () {
+                // Here we invoke the notification logic (placeholder)
+                print('Notify ${helper.name}');
+                // Show a SnackBar after the notification action
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Successfully notified ${helper.name}'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              },
+            ),
+          );
+        },
       ),
     );
   }
