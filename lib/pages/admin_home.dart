@@ -6,6 +6,7 @@ import 'user_manual.dart'; // Import the UserManualPage
 import 'logout_page.dart'; // Import the LogoutPage
 import 'report_emergency.dart'; // Import the ReportEmergencyPage
 import 'update_profile_page.dart'; // Import the UpdateProfilePage
+import 'userpage.dart';
 
 void main() {
   runApp(MyApp());
@@ -83,6 +84,7 @@ class AdminHomePage extends StatelessWidget {
                 },
                 child: Text('View Users', style: TextStyle(fontSize: 18)),
               ),
+
               SizedBox(height: 20),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -154,52 +156,7 @@ class AdminHomePage extends StatelessWidget {
   }
 }
 
-class UsersPage extends StatelessWidget {
-  final List<String> users = ['User1', 'User2', 'User3']; // Sample user data
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue, // Set the background color to blue
-        title: Center(
-          child: Text(
-            'Users', // Title of the AppBar
-            style: TextStyle(color: Colors.white, fontSize: 24), // White color for the title text
-          ),
-        ),
-      ),
-      body: ListView.builder(
-        padding: EdgeInsets.all(16.0),
-        itemCount: users.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(users[index]),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.edit, color: Colors.blue),
-                  onPressed: () {
-                    // TODO: Implement edit user functionality
-                    print('Edit ${users[index]}');
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.delete, color: Colors.red),
-                  onPressed: () {
-                    // TODO: Implement delete user functionality
-                    print('Delete ${users[index]}');
-                  },
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
 
 class EmergencyReportsPage extends StatelessWidget {
   final List<String> reports = ['Report1', 'Report2', 'Report3']; // Sample report data
