@@ -47,4 +47,9 @@ class DatabaseService {
       "emergencyContact": emergencyContact,
     });
   }
+
+  // Add this method to fetch all users
+  Future<QuerySnapshot> getAllUsers() async {
+    return await userCollection.get();
+  }
 }
